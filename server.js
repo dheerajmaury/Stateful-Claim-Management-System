@@ -7,15 +7,21 @@ dotenv.config(); // ✅ Load environment variables from .env
 
 const app = express();
 
+// ✅ CORS Middleware (Updated)
+app.use(cors({
+  origin: ["http://localhost:3000", "https://your-vercel-frontend-url.vercel.app"], // Add your frontend URL when deployed
+  methods: "GET,POST,PUT,DELETE",
+  allowedHeaders: "Content-Type,Authorization"
+}));
+
+// ✅ Middleware
+app.use(express.json());
+
 // ✅ Import Routes
 const policyholderRoutes = require("./routes/policyholderRoutes");
 const policyRoutes = require("./routes/policyRoutes");
 const claimRoutes = require("./routes/claimRoutes");
 const authRoutes = require("./routes/authRoutes");
-
-// ✅ Middleware
-app.use(express.json());
-app.use(cors());
 
 // ✅ Define Routes
 app.use("/api/policyholders", policyholderRoutes);
@@ -43,7 +49,6 @@ mongoose.connect(MONGO_URI)
     console.error("❌ MongoDB connection error:", err);
     process.exit(1);
   });
-
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
