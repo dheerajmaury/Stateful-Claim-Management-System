@@ -7,9 +7,9 @@ dotenv.config(); // ✅ Load environment variables from .env
 
 const app = express();
 
-// ✅ CORS Middleware (Updated)
+// ✅ CORS Middleware (Allow from Any Origin)
 app.use(cors({
-  origin: ["http://localhost:3000", "https://your-vercel-frontend-url.vercel.app"], // Add your frontend URL when deployed
+  origin: "*", // Allow all origins
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization"
 }));
