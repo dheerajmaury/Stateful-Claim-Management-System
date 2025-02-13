@@ -1,9 +1,15 @@
 const request = require("supertest");
 const { app, server } = require("../server"); // Import the app and server
+const { default: mongoose } = require("mongoose");
 
-afterAll(() => {
-  server.close(); // ✅ Ensures server shuts down after tests
-});
+// afterAll(() => {
+//   server.close(); // ✅ Ensures server shuts down after tests
+// });
+describe("Backend-Test",()=>{
+ afterAll(async ()=>{
+  await mongoose.connection.close();
+ })
+
 
 describe("Claim API Tests", () => {
   it("should create a claim", async () => {
@@ -31,4 +37,5 @@ describe("Claim API Tests", () => {
     expect(response.statusCode).toBe(404);
     expect(response.body.message).toBe("Policy not found");
   });
+});
 });
