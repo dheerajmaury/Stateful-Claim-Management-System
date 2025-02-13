@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const client = require("prom-client"); // ✅ Import Prometheus client
 
 dotenv.config(); // ✅ Load environment variables from .env
 
@@ -29,6 +30,32 @@ app.use("/api/policies", policyRoutes);
 app.use("/api/claims", claimRoutes);
 app.use("/api/auth", authRoutes);
 
+// ✅ Prometheus Metrics Setup
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
+
+// API Request Counter
+const httpRequestCounter = new client.Counter({
+  name: "http_requests_total",
+  help: "Total number of HTTP requests",
+  labelNames: ["method", "route", "status"],
+});
+register.registerMetric(httpRequestCounter);
+
+// Middleware to track requests
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    httpRequestCounter.inc({ method: req.method, route: req.path, status: res.statusCode });
+  });
+  next();
+});
+
+// ✅ Metrics Route
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", register.contentType);
+  res.end(await register.metrics());
+});
+
 // ✅ Test Route
 app.get("/", (req, res) => {
   res.send("Claim Management System API is running...");
@@ -50,5 +77,17 @@ mongoose.connect(MONGO_URI)
     process.exit(1);
   });
 
+// // const PORT = process.env.PORT || 5000;
+// // app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// const server = app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+// module.exports = { app, server };
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+const server = app.listen(PORT, () => {
+  if (process.env.NODE_ENV !== "test") {
+    console.log(`🚀 Server running on port ${PORT}`);
+  }
+});
+
+module.exports = { app, server };
