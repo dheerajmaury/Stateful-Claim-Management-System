@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const client = require("prom-client"); // ✅ Import Prometheus client
+MONGO_URI="mongodb+srv://dheerajmaurya1906:5EmDj7wR3P1iXKJs@claimsdbs.ffl66.mongodb.net/?retryWrites=true&w=majority&appName=ClaimsDBS"
 
 dotenv.config(); // ✅ Load environment variables from .env
 
@@ -62,7 +63,7 @@ app.get("/", (req, res) => {
 });
 
 // ✅ Get MONGO_URI from .env
-const MONGO_URI = process.env.MONGO_URI;
+// const MONGO_URI = process.env.MONGO_URI;
 
 if (!MONGO_URI) {
   console.error("❌ Error: MONGO_URI is not defined in the environment variables!");
